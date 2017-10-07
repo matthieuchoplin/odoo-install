@@ -1,6 +1,6 @@
 # odoo-install
 
-Set up a VM using ubuntu/trusty64 base box and provision it with odoo_install.sh to install odoo version 11.0
+Set up a VM using ubuntu/xenial64 base box and provision it with odoo_install.sh to install odoo version 11.0
 
 ## Requires:
 

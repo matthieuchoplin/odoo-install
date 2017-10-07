@@ -4,8 +4,6 @@
 # ./odoo-install
 ################################################################################
 
-##fixed parameters
-#odoo
 OE_USER="odoo"
 OE_HOME="/$OE_USER"
 OE_HOME_EXT="/$OE_USER/${OE_USER}-server"
@@ -14,15 +12,13 @@ OE_HOME_EXT="/$OE_USER/${OE_USER}-server"
 INSTALL_WKHTMLTOPDF="True"
 #Set the default Odoo port (you still have to use -c /etc/odoo-server.conf for example to use this.)
 OE_PORT="8069"
-#Choose the Odoo version which you want to install. For example: 9.0, 8.0, 7.0 or saas-6. When using 'trunk' the master version will be installed.
-#IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 9.0
 OE_VERSION="11.0"
 #set the superadmin password
 OE_SUPERADMIN="admin"
 OE_CONFIG="${OE_USER}-server"
 
 ###  WKHTMLTOPDF download links
-## === Ubuntu Trusty x64 & x32 === (for other distributions please replace these two links,
+## === Ubuntu  x64 & x32 === (for other distributions please replace these two links,
 ## in order to have correct version of wkhtmltox installed, for a danger note refer to 
 ## https://www.odoo.com/documentation/8.0/setup/install.html#deb ):
 WKHTMLTOX_X64=https://downloads.wkhtmltopdf.org/0.12/0.12.1/wkhtmltox-0.12.1_linux-trusty-amd64.deb
@@ -34,7 +30,7 @@ sudo apt-get upgrade -y
 
 echo -e "\n---- Install PostgreSQL Server ----"
 sudo apt-get install postgresql -y
-sudo apt-get install postgresql-server-dev-9.3 -y
+sudo apt-get install postgresql-server-dev-9.3 postgresql-server-dev-all -y
 
 echo -e "\n---- Creating the ODOO PostgreSQL User  ----"
 sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
@@ -42,22 +38,23 @@ sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
 #--------------------------------------------------
 # Install Dependencies
 #--------------------------------------------------
-echo -e "\n--- Installing Python 3 + pip3 --"
-sudo apt-get install python3 python3-pip --fix-missing -y
+echo -e "\n--- Installing pip3--"
+sudo apt-get install python3-pip --fix-missing -y
 
 echo -e "\n---- Install tool packages ----"
 sudo apt-get install wget git gdebi-core -y
 
 echo -e "\n---- Install python packages ----"
-sudo apt-get install libldap2-dev libpython-dev python3-lxml python-dateutil python-feedparser python-ldap python-libxslt1 python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y
+sudo apt-get install libldap2-dev libpython-dev python3-setuptools libxml2-dev libxslt-dev libxslt1-dev python3-dev python3-lxml python-dateutil python-feedparser python-ldap python-libxslt1 python-mako python-openid python-psycopg2 python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi python-docutils python-psutil python-mock python-unittest2 python-jinja2 python-pypdf python-decorator python-requests python-passlib python-pil -y
 sudo pip3 install pypdf2 pyPdf Babel passlib Werkzeug decorator python-dateutil pyyaml psutil html2text docutils
 
-sudo apt-get install build-dep python3-lxml postgresql-server-dev-9.3 postgresql-server-dev-all build-essential python3-dev python-dev postgresql postgresql-contrib python3-psycopg2 libpq-dev libjpeg-dev libsasl2-dev libldap2-dev libffi-dev libssl-dev python-lxml libxml2-dev libxslt1-dev libsasl2-dev -y --fix-missing
+sudo apt-get install build-dep build-essential python-dev postgresql postgresql-contrib python3-psycopg2 libpq-dev libjpeg-dev libsasl2-dev libldap2-dev libffi-dev libssl-dev libsasl2-dev -y --fix-missing
 
-sudo apt-get install libsasl2-dev libxml2-dev libxmlsec1-dev libjpeg-dev -y
+sudo apt-get install libsasl2-dev libxmlsec1-dev libjpeg-dev -y
 
 echo -e "\n---- Install python libraries ----"
 sudo pip3 install gdata psycogreen
+sudo easy_install3 lxml
 
 echo -e "\n--- Install other required packages"
 sudo apt-get install node-clean-css -y
@@ -112,11 +109,7 @@ sudo su root -c "printf '[options] \n; This is the password that allows database
 sudo su root -c "printf 'admin_passwd = ${OE_SUPERADMIN}\n' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "printf 'xmlrpc_port = ${OE_PORT}\n' >> /etc/${OE_CONFIG}.conf"
 sudo su root -c "printf 'logfile = /var/log/${OE_USER}/${OE_CONFIG}\n' >> /etc/${OE_CONFIG}.conf"
-if [ $IS_ENTERPRISE = "True" ]; then
-    sudo su root -c "printf 'addons_path=${OE_HOME}/enterprise/addons,${OE_HOME_EXT}/addons\n' >> /etc/${OE_CONFIG}.conf"
-else
-    sudo su root -c "printf 'addons_path=${OE_HOME_EXT}/addons,${OE_HOME}/custom/addons\n' >> /etc/${OE_CONFIG}.conf"
-fi
+sudo su root -c "printf 'addons_path=${OE_HOME_EXT}/addons,${OE_HOME}/custom/addons\n' >> /etc/${OE_CONFIG}.conf"
 sudo chown $OE_USER:$OE_USER /etc/${OE_CONFIG}.conf
 sudo chmod 640 /etc/${OE_CONFIG}.conf
 
